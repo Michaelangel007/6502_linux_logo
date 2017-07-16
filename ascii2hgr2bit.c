@@ -18,6 +18,7 @@ Michaelangel007
   https://github.com/deater/linux_logo/blob/master/logos/banner.logo
 
 */
+int gbOutputHgr = 0;
 
 unsigned char  gaLogoBits[ 280 / 2 * 192 / 8 ]; // packed bits
 const    char* gaLogo70 = 
@@ -41,7 +42,7 @@ Bitpacked 2-bits/2 pixels
  0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17.5
  <--><--><--><--><--><--><--><--><--><--><--><--><--><--><--><--><--><-->
 */
-#if 0
+#if 1
 "__________________________________________________________@@@@@_______"
 "_________________________________________________________@@@@@@@______"
 "______________A__________________________________________@@_@_@@______"
@@ -55,16 +56,26 @@ Bitpacked 2-bits/2 pixels
 "__@@____@@_AA@_@_@@_____@@__@@@___@@@____@@___@@___BBBBBB@_____@BBBBBB"
 "@@@@@@@@@@__@@@_@@@@___@@@@___@@@@_@@@_@@@@@_@@@@@__BBBBB@@@@@@@BBBBB_"
 #else
-"@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-"
+// _@_@_@_@_@_@_@ = PACK: $33,$33,$33,$33 -> HGR: $33,$66,$4C,$19 (MSB=0)
+//                =                          HGR: $B3,$E6,$CC,$99 (MSB=1)
+//"_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@"
+
+// @_@_@_@_@_@_@_ =                          HGR: $4C,$19,$33,$66 (MSB=0)
+//                = PACK: $CC,$CC,$CC,$CC -> HGR: $CC,$99,$B3,$E6 (MSB=1)
+//"@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_@_"
 #endif
 ;
 
 int main( const int nArg, const char *aArg[] )
 {
+    (void) aArg;
+    if( nArg > 1 )
+        gbOutputHgr = 1;
+
     const    char *src = gaLogo70;
     unsigned char *dst = gaLogoBits;
 
-    unsigned char  bit = 0;
+    unsigned int   bit = 0;
     unsigned char  shl = 0;
     unsigned int   len = 0;
     unsigned int   i;
@@ -74,13 +85,22 @@ int main( const int nArg, const char *aArg[] )
         bit |= (*src & 3) << shl;
         shl += 2;
 
+if( gbOutputHgr )
+{
+        if( shl >= 8 )
+        {
+            shl -= 7 ;
+           *dst++= (0x80 | bit);
+            bit >>= 7;
+        }
+} else {
         if( shl >= 8 )
         {
             shl -= 8 ;
-           *dst++ = bit;
+           *dst++= bit;
             bit  = 0;
         }
-
+}
         src++;
     }
 
