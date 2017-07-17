@@ -8,8 +8,8 @@ Size: 696 ($2B8) bytes
 
 # Screenshots
 
-![Apple \]\[+](pics/linux_logo_2.png)
-![Apple \]\[ ](pics/linux_logo_2plus.png)
+![Apple \]\[ ](pics/linux_logo_2.png)
+![Apple \]\[+](pics/linux_logo_2plus.png)
 ![Apple //e  ](pics/linux_logo_2e.png)
 ![Apple //e+ ](pics/linux_logo_2eplus.png)
 
@@ -48,4 +48,7 @@ NOTE: PackedLen isn't needed if full 40 bytes HGR width is unpacked to.
 
 Inspired from non-optimized version. Size: 1,573 ($625) bytes
 * https://github.com/deater/linux_logo
+
+![Apple \]\[+](pics/ll_6502_2plus.png)
+![Apple //e  ](pics/ll_6502_2e.png)
 
