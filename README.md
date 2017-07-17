@@ -8,7 +8,7 @@
 
 Linux Logo in 6502 assembly language.
 
-Size: 703 ($2BF) bytes
+Size: 701 ($2BD) bytes
 
 Features:
 
@@ -40,6 +40,7 @@ __@@____@@_AA@_@_@@_____@@__@@@___@@@____@@___@@___BBBBBB@_____@BBBBBB
 ```
 
 See: [ascii2hgr2bit](ascii2hgr2bit.c) for packing ASCII to 2 bits/char.
+NOTE: PackedLen isn't needed if full 40 bytes HGR width is unpacked to.
 
 Inspired from non-optimized version. Size: 1,573 ($625) bytes
 * https://github.com/deater/linux_logo

@@ -91,6 +91,7 @@ apple_ii_normal
 set_apple_ii
         sta ModType         ; erase last 'e' in 'Apple IIe'
 
+        lda #" "            ; $A0
         sta CpuType         ; '_6502'
         lda #"6"
         sta CpuType+1
@@ -187,8 +188,7 @@ CheckFetch
         cmp #8              ; have 8 input bits?
         bne GetBit
         iny                 ; src++
-        cpy PackedLen
-        bcc NextSrcShift    ; C=0 -> STZ zSrcShift
+        bne NextSrcShift
 UnpackDone
 
 
