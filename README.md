@@ -21,9 +21,9 @@ Size: 696 ($2B8) bytes
 * Detects 48K/64K/128K 
 * System information in all uppercase (for Apple \]\[ without lowercase)
 * Cleaned up fugly logo by Albert Lai
-  * Width is now 70 chars to be exact 4 pixels/char for 280 HGR resolution
-  * Bit-packed Logo takes up 210 bytes (2 bits/char) compared to 80*12 = 960 byte
-  * Logo is bit packed 2 bits/char, expands 70 chars * 4 px = 280 px
+  * Logo is 70 chars wide
+  * Logo is bit packed 2 bits/char; expands 70 chars * 4 px = 280 px
+  * Logo takes up 70*12*2/8 = 210 bytes compared to 80*12 = 960 bytes
   * X is now symmetrical
   * Fixed L,i,n kerning
   * Fixed x Penguin kerning
