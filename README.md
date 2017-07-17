@@ -54,3 +54,10 @@ Inspired from non-optimized version. Size: 1,573 ($625) bytes
 ![Apple \]\[+](pics/ll_6502_2plus.png)
 ![Apple //e  ](pics/ll_6502_2e.png)
 
+
+# License
+
+[WTFPl](http://www.wtfpl.net/)
+
+If you use code, please provide a comment link so people can follow it for updates.
+
