@@ -9,14 +9,15 @@ gcc -Wall -Wextra ascii2hgr2bit.c -o ascii2hgr2bit
 #include <stdio.h>
 
 /*
-  Cleaned up crappy logo by Albert Lai <aylai@unixg.ubc.ca>
+  Cleaned up fugly logo by Albert Lai <aylai@unixg.ubc.ca>
 
     * Width is now 70 chars to be exact 4 pixels/char for 280 resolution
+    * Logo takes up 210 bytes (2 bits/char) compared to 80*12 = 960 byte
     * X is now symmetrical
     * Fixed L,i,n kerning
     * Fixed x Penguin kerning
     * Fixed L to fit
-    * Chopped off 2 columsn of penguin to fit 70 chars
+    * Chopped off 2 columns of penguin to fit 70 chars
 
   https://github.com/deater/linux_logo/blob/master/logos/banner.logo
 

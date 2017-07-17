@@ -11,9 +11,15 @@ Features:
 
 * Detects Apple \]\[, \]\[+, //e, //e+, //c, //c+
 * Detects 48K/64K/128K 
-* Cleaned up fugly Linux Logo
-  * Made logo 70 chars for integer multiple of 280 HGR width
+* Cleaned up fugly logo by Albert Lai <aylai@unixg.ubc.ca>
+  * Width is now 70 chars to be exact 4 pixels/char for 280 HGR resolution
   * Logo takes up 210 bytes (2 bits/char) compared to 80*12 = 960 byte
+  * X is now symmetrical
+  * Fixed L,i,n kerning
+  * Fixed x Penguin kerning
+  * Fixed L to fit
+  * Chopped off 2 columns of penguin to fit 70 chars
+
 
 ```
 __________________________________________________________@@@@@_______
