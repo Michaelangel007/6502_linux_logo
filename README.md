@@ -16,13 +16,13 @@ Features:
 * Detects 48K/64K/128K 
 * Cleaned up fugly logo by Albert Lai <aylai@unixg.ubc.ca>
   * Width is now 70 chars to be exact 4 pixels/char for 280 HGR resolution
-  * Logo takes up 210 bytes (2 bits/char) compared to 80*12 = 960 byte
+  * Bit-packed Logo takes up 210 bytes (2 bits/char) compared to 80*12 = 960 byte
   * X is now symmetrical
   * Fixed L,i,n kerning
   * Fixed x Penguin kerning
   * Fixed L to fit
   * Chopped off 2 columns of penguin to fit 70 chars
-
+* Expands 2 bits to 4 bits = 2 pixels (70 chars * 4 bits = 280 px)
 
 ```
 __________________________________________________________@@@@@_______
@@ -39,7 +39,7 @@ __@@____@@_AA@_@_@@_____@@__@@@___@@@____@@___@@___BBBBBB@_____@BBBBBB
 @@@@@@@@@@__@@@_@@@@___@@@@___@@@@_@@@_@@@@@_@@@@@__BBBBB@@@@@@@BBBBB_
 ```
 
-See: [ascii2hgr2bit](ascii2hgr2bit.c) for packing ASCII to 2 bits/4 pixels.
+See: [ascii2hgr2bit](ascii2hgr2bit.c) for packing ASCII to 2 bits/char.
 
 Inspired from non-optimized version. Size: 1,573 ($625) bytes
 * https://github.com/deater/linux_logo
