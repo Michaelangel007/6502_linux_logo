@@ -1,16 +1,20 @@
 
 # 6502 Linux Logo
 
+Linux Logo in 6502 assembly language.
+
+Size: 696 ($2B8) bytes
+
+
+# Screenshots
+
 ![Apple \]\[+](pics/linux_logo_2.png)
 ![Apple \]\[ ](pics/linux_logo_2plus.png)
 ![Apple //e  ](pics/linux_logo_2e.png)
 ![Apple //e+ ](pics/linux_logo_2eplus.png)
 
-Linux Logo in 6502 assembly language.
 
-Size: 696 ($2B8) bytes
-
-Features:
+# Features
 
 * Detects Apple \]\[, \]\[+, //e, //e+, //c, //c+
 * Detects 48K/64K/128K 
