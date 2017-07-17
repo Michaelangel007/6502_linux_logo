@@ -34,7 +34,7 @@ MACHINEID2  = $FBC0
 MACHINEID3  = $FBBF ; //c version
 
 ; Config
-UnpackAddr  = $200 ; $28 bytes at Keyboard buffer
+UnpackAddr  = $3FD0 ; Y=191, $28 bytes at Keyboard buffer
 CONFIG_PROBE_CPUINFO = 1
 CONFIG_PRINT_CPUINFO = 1
 
@@ -156,11 +156,9 @@ Unpack
         jsr AS_HGR ; *** DEBUG ***
     FIN
 
-        lda #8          ; $0428 (Text) + $1C00 => $2028 (HGR)
+        lda #7          ; will INC, $0428 (Text) + $1C00 => $2028 (HGR)
         sta zCursorY    ; Start Row=8
 DrawRow
-        jsr GetDestAddr
-
         lda #0
         tay   
         tax                 ; DstOffset within page
@@ -290,6 +288,8 @@ NoShiftSherlock
 ; Copy Buffer to HGR
 
         sty zSaveY
+        inc zCursorY
+        jsr GetDestAddr
 
         ldx #7              ; Repeat each scanline 8 times
 Draw8Rows
@@ -297,8 +297,14 @@ Draw8Rows
 CopyScanLine
         lda UnpackAddr,Y      
         sta (zHgrPtr),Y
+
+        cpx #0              ; Clear source on last scanline copy
+        bne CopyNextByte
+        txa
+        sta UnpackAddr,Y
+CopyNextByte
         iny
-        cpy #40
+        cpy #40             ; 280/7 = 40 bytes/scanline
         bne CopyScanLine
 
         clc                 ; y = y+1
@@ -310,8 +316,6 @@ CopyScanLine
 
         ldy zSaveY
                
-        inc zCursorY
-        jsr GetDestAddr
         lda zCursorY
         cmp #$14            ; Y=$40 .. $A0, Rows $8..$13 (inclusive)
         bcs OuputDone
@@ -349,13 +353,6 @@ GetDestAddr
         adc #$1c        ; is Text Page $04 + $1C = HGR Page $20
         sta zHgrPtr+1
 
-        lda #0
-        ldx #40-1
-ClearBuffer
-        sta UnpackAddr,X
-        dex
-        bpl ClearBuffer       
-        
         rts
 
 ; ------------------------------------------------------------------------

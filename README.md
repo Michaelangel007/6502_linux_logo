@@ -8,7 +8,7 @@
 
 Linux Logo in 6502 assembly language.
 
-Size: 701 ($2BD) bytes
+Size: 696 ($2B8) bytes
 
 Features:
 
