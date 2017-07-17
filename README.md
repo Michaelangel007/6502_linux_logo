@@ -1,7 +1,8 @@
 
 # 6502 Linux Logo
 
-![Apple \]\[+](pics/linux_logo_2plus.png)
+![Apple \]\[+](pics/linux_logo_2.png)
+![Apple \]\[ ](pics/linux_logo_2plus.png)
 ![Apple //e  ](pics/linux_logo_2e.png)
 ![Apple //e+ ](pics/linux_logo_2eplus.png)
 
