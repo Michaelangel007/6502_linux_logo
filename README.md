@@ -1,6 +1,8 @@
 
 # 6502 Linux Logo
 
+![linux_logo.png](linux_logo.png)
+
 Linux Logo in 6502 assembly language.
 
 Size: 703 ($2BF) bytes
