@@ -78,6 +78,7 @@ apple_ii
 apple_iiplus
         jsr AS_HGR         ; ][ = $D000, Only on Apple ][+
 
+
         pla
         cmp  #$EA           ;  apple ][+?
         bne apple_iie       ; if so keep going
@@ -89,14 +90,25 @@ apple_iiplus
 apple_ii_normal
         lda #" "            ; $A0
 set_apple_ii
+        ldx #"]"
+        ldy #"["
+        stx ModType-2
+        sty ModType-1
         sta ModType         ; erase last 'e' in 'Apple IIe'
+
+;        ldx #3-1
+;SetCpu6502
+;        lda CpuTye6502,X
+;        sta CpuType,X
+;        dex
+;        bne SetCpu6502
 
         lda #" "            ; $A0
         sta CpuType         ; '_6502'
-        lda #"6"
-        sta CpuType+1
-        lda #"5"
-        sta CpuType+2
+        ldx #"6"
+        ldy #"5"
+        stx CpuType+1
+        sty CpuType+2
 
 detect_langcard
         sta RAMIN           ; Detect 16K RAM / Language Card
@@ -168,23 +180,25 @@ DrawRow
         sta zUnpackBits+0
 
 NextSrcShift
-        lda #0
-        sta zSrcShift
         lda PackedBits+1,Y
         sta zUnpackBits+1
-GetBit
+        lda #0
+UpdateSrcShift
+        sta zSrcShift
+
         jsr Unpack2Bits     ; hhggffee C=? ddccbbaa 
         bcs UnpackDone
+
         lsr zUnpackBits+1   ; 0hhggffe C=e ddccbbaa
         ror zUnpackBits+0   ; 0hhggffe C=e eddccbba
         lsr zUnpackBits+1   ; 00hhggff C=e eddccbba
         ror zUnpackBits+0   ; 00hhggff c=e eeddccbb 
-        inc zSrcShift       ;
-        inc zSrcShift
-CheckFetch
+
         lda zSrcShift
+        clc
+        adc #2
         cmp #8              ; have 8 input bits?
-        bne GetBit
+        bne UpdateSrcShift
         iny                 ; src++
         bne NextSrcShift
 UnpackDone
@@ -361,13 +375,14 @@ CpuType = * + 13 + 40
 RamSize = * + 30 + 40
 ModType = * + 24 + 40*2
 
-; Uppercase in case of Apple II without lowercase support
+; Uppercase in case of Apple ][ without lowercase support
             ;          1         2         3
 TextLine    ;0123456789012345678901234567890123456789
         ASC "  LINUX VERSION 2.6.22.6, COMPILED 2007 " ; Row $14
         ASC " ONE 1.02MHZ 65C02 PROCESSOR, 128KB RAM " ; Row $15
-        ASC "                APPLE IIe               " ; Row $16
+        ASC "                APPLE //e               " ; Row $16
 ;                         ^          ^     ^
+;                         CPUTYPE    MOD   RAM
 
 ; ------------------------------------------------------------------------
 

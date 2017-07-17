@@ -3,7 +3,7 @@
 
 Linux Logo in 6502 assembly language.
 
-Size: 696 ($2B8) bytes
+Size: 705 ($2C1) bytes
 
 
 # Screenshots
@@ -17,6 +17,7 @@ Size: 696 ($2B8) bytes
 # Features
 
 * Detects Apple \]\[, \]\[+, //e, //e+, //c, //c+
+  * Pretty-print model instead of generic "II_" (bloats from 696 but worth it.)
 * Detects 48K/64K/128K 
 * System out all uppercase (for Apple \]\[ without lowercase)
 * Cleaned up fugly logo by Albert Lai
