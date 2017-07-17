@@ -1,7 +1,9 @@
 
 # 6502 Linux Logo
 
-![linux_logo.png](linux_logo.png)
+![Apple \]\[+](pics/linux_logo_2plus.png)
+![Apple //e  ](pics/linux_logo_2e.png)
+![Apple //e+ ](pics/linux_logo_2eplus.png)
 
 Linux Logo in 6502 assembly language.
 
