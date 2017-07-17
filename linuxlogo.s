@@ -246,14 +246,15 @@ Unpack2Bits
 
 ; DoublePixel
         stx zSaveX
+        sty zSaveY
+        
         lda zUnpackBits
-        and #3      ; A=000000ba
-        pha
-        asl         ; A=00000ba0
-        asl         ; A=0000ba00
-        sta zMask   
-        pla
-        ora zMask   ; A=0000baba 
+        asl                 ; A=?????ba0
+        asl                 ; A=????ba00
+        eor zUnpackBits     ; A=????xxyy
+        and #%00001100      ; A=????xx00
+        eor zUnpackBits     ; A=????baba
+        and #%00001111      ; A=0000baba
 
         ldx #0
         stx zMask
@@ -267,14 +268,16 @@ MakeShiftMask
         bne MakeShiftMask
 NoShiftSherlock
 
-        cmp #$80            ; msb of byte0 set?
+        asl                 ; msb of byte0 set?
         rol zMask           ; shift in to lsb of byte1
 
-        ldx zDstShift       ; x={0,1,2} + 4 < 7
-        cpx #3              ; all bits fit into dest byte?
+        sec                 ; MSB=1 color=blue/orange
+        ror
+
+        ldy zDstShift       ; x={0,1,2} + 4 < 7
+        cpy #3              ; all bits fit into dest byte?
 
         ldx zSaveX
-        ora #$80
         ora UnpackAddr,X    ; do all bits that fit
         sta UnpackAddr,X
         bcc UpdateDestOffset
@@ -291,71 +294,20 @@ NoShiftSherlock
 
         ; x = x + 4 - 7
         ; x = x - 3
-        ldx zDstShift
-        dex
-        dex
-        dex
-
+        ldy zDstShift
+        dey
+        dey
+        dey
         bcc LineNotDone     ; C = x < 28
 
 ; ------------------------------------------------------------------------
 ; Copy Buffer to HGR
 
-        sty zSaveY
         inc zCursorY
-        jsr GetDestAddr
-
-        ldx #7              ; Repeat each scanline 8 times
-Draw8Rows
-        ldy #0
-CopyScanLine
-        lda UnpackAddr,Y      
-        sta (zHgrPtr),Y
-
-        cpx #0              ; Clear source on last scanline copy
-        bne CopyNextByte
-        txa
-        sta UnpackAddr,Y
-CopyNextByte
-        iny
-        cpy #40             ; 280/7 = 40 bytes/scanline
-        bne CopyScanLine
-
-        clc                 ; y = y+1
-        lda zHgrPtr+1       ; addr_y+1 = addr_y + $0400
-        adc #$04
-        sta zHgrPtr+1
-        dex
-        bpl Draw8Rows
-
-        ldy zSaveY
-               
-        lda zCursorY
-        cmp #$14            ; Y=$40 .. $A0, Rows $8..$13 (inclusive)
-        bcs OuputDone
-
-        ldx #0
-        stx zSaveX
-        beq LineNotDone     ; Next Scan Line, start at dst bit 0
-
-UpdateDestOffset
-        ldx zDstShift
-        inx
-        inx
-        inx
-        inx
-LineNotDone
-        stx zDstShift
-        clc
-        ldx zSaveX
-OuputDone
-        rts
 
 ; ------------------------------------------------------------------------
 ; Udpate the Text Address
 ; Update the HGR scanline Address
-; Clear the Text buffer
-GetDestAddr
         lda zCursorY
         jsr BASCALC
 
@@ -366,8 +318,50 @@ GetDestAddr
         clc             ; every 8 HGR scanline address
         adc #$1c        ; is Text Page $04 + $1C = HGR Page $20
         sta zHgrPtr+1
+; ------------------------------------------------------------------------
 
+        ldx #7              ; Repeat each scanline 8 times
+Draw8Rows
+        ldy #39             ; 280/7 = 40 bytes/scanline
+CopyScanLine
+        lda UnpackAddr,Y      
+        sta (zHgrPtr),Y
+
+        txa                 ; Clear source on last scanline copy
+        bne CopyNextByte
+        sta UnpackAddr,Y
+CopyNextByte
+        dey
+        bpl CopyScanLine
+
+        clc                 ; y = y+1
+        lda zHgrPtr+1       ; HGR addr_y+1 = addr_y + $0400
+        adc #$04
+        sta zHgrPtr+1
+
+        stx zSaveX          ; X=0 last loop iteration
+        dex
+        bpl Draw8Rows
+
+        iny                 ; Y=0 -> zDstShift
+               
+        lda zCursorY
+        cmp #$14            ; Y=$40 .. $A0, Rows $8..$13 (inclusive)
+        bcs OuputDone
+        bcc LineNotDone     ; Next Scan Line, start at dst bit 0
+
+UpdateDestOffset            ; C=0 from NoShiftSherlock 
+        iny
+        iny
+        iny
+        iny
+LineNotDone
+        sty zDstShift
+        ldx zSaveX          ; NOTE: C=0 from CMPs above
+        ldy zSaveY
+OuputDone
         rts
+
 
 ; ------------------------------------------------------------------------
 
