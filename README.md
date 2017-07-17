@@ -32,6 +32,6 @@ __@@____@@_AA@_@_@@_____@@__@@@___@@@____@@___@@___BBBBBB@_____@BBBBBB
 
 See: [ascii2hgr2bit](ascii2hgr2bit.c) for packing ASCII to 2 bits/4 pixels.
 
-Inspirited from non-optimized version. Size: 1,573 ($625) bytes
+Inspired from non-optimized version. Size: 1,573 ($625) bytes
 * https://github.com/deater/linux_logo
 
