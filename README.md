@@ -14,7 +14,7 @@ Features:
 
 * Detects Apple \]\[, \]\[+, //e, //e+, //c, //c+
 * Detects 48K/64K/128K 
-* Cleaned up fugly logo by Albert Lai <aylai@unixg.ubc.ca>
+* Cleaned up fugly logo by Albert Lai
   * Width is now 70 chars to be exact 4 pixels/char for 280 HGR resolution
   * Bit-packed Logo takes up 210 bytes (2 bits/char) compared to 80*12 = 960 byte
   * X is now symmetrical
