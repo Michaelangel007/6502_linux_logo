@@ -300,7 +300,7 @@ NoShiftSherlock
         bcc FitSameByte     ; C = x < 28
 
 ; ------------------------------------------------------------------------
-; Copy Buffer to HGR
+; Copy unpacked buffer to 8 HGR scanlines
 
         inc zCursorY
 
