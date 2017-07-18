@@ -160,8 +160,9 @@ done_detecting
 ; ------------------------------------------------------------------------
 ; Unpack 2 bits/color -> $28 bytes/scanline
 ;
-; Unpack one line to $200
+; Unpack one line to buffer at Y=191 HGR line
 ; Copy to 8 scanlines
+; Erase buffer after copying to final 8 scanlines
 Unpack
 
     DO 1-CONFIG_PROBE_CPUINFO
