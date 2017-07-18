@@ -17,7 +17,7 @@ Size: 681 ($2A9) bytes
 # Features
 
 * Detects Apple \]\[, \]\[+, //e, //e+, //c, //c+
-  * Pretty-print model instead of generic "II_" (bloats from 696 but worth it.)
+  * Pretty-print model instead of generic `II` (bloats the code slightly but worth it.)
 * Detects 48K/64K/128K 
 * System information in all uppercase (for Apple \]\[ without lowercase)
 * Cleaned up fugly logo by Albert Lai
