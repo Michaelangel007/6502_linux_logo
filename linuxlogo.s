@@ -72,12 +72,11 @@ detect_ram
 
 apple_ii
         pla
-        jsr IB_HGR          ; HGR on ][, ends with BNE $D01B
-        beq apple_ii_normal
+        jsr IB_HGR          ; HGR on ][
+        beq apple_ii_normal ; always, ends with BNE $D01B RTS
 
 apple_iiplus
         jsr AS_HGR         ; ][ = $D000, Only on Apple ][+
-
 
         pla
         cmp  #$EA           ;  apple ][+?
@@ -96,15 +95,8 @@ set_apple_ii
         sty ModType-1
         sta ModType         ; erase last 'e' in 'Apple IIe'
 
-;        ldx #3-1
-;SetCpu6502
-;        lda CpuTye6502,X
-;        sta CpuType,X
-;        dex
-;        bne SetCpu6502
-
-        lda #" "            ; $A0
-        sta CpuType         ; '_6502'
+        lda #" "            ; "_6502"
+        sta CpuType         ;  ^^^
         ldx #"6"
         ldy #"5"
         stx CpuType+1
@@ -228,6 +220,7 @@ CopyTextLine
 
         dec zCursorY
 
+; ------------------------------------------------------------------------
 ; End of String offse for Model
 ; IN: X = 0 II+
 ;             ^
@@ -372,7 +365,7 @@ FitSameByte
         rts
 
 
-; ------------------------------------------------------------------------
+; ========================================================================
 
 CpuType = * + 13 + 40
 RamSize = * + 30 + 40
