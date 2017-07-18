@@ -8,9 +8,9 @@ zCursorY    = $25 ; CH
 zHgrPtr     = $26 ; GBASL = Dst
 zTxtPtr     = $28 ; BASL  = Dst
 
-zSaveX      = $F9
+zDstOffset  = $F9 ; unpack[ iDst ]
 zSaveY      = $FA
-zMask       = $FB ; 16-bit but Acc has low
+zMask       = $FB ; adjacent byte for next pixels
 zSrcShift   = $FC ; i mod 8
 zDstShift   = $FD ; i mod 7
 zUnpackBits = $FE ; 16-bit unpack
@@ -34,7 +34,7 @@ MACHINEID2  = $FBC0
 MACHINEID3  = $FBBF ; //c version
 
 ; Config
-UnpackAddr  = $3FD0 ; Y=191, $28 bytes at Keyboard buffer
+UnpackAddr  = $3FD0 ; Y=191, $28 bytes
 CONFIG_PROBE_CPUINFO = 1
 CONFIG_PRINT_CPUINFO = 1
 
@@ -168,13 +168,13 @@ Unpack
         jsr AS_HGR ; *** DEBUG ***
     FIN
 
-        lda #7          ; will INC, $0428 (Text) + $1C00 => $2028 (HGR)
-        sta zCursorY    ; Start Row=8
-DrawRow
+        lda #7              ; will INC, $0428 (Text) + $1C00 => $2028 (HGR)
+        sta zCursorY        ; Start Row=8
         lda #0
         tay   
-        tax                 ; DstOffset within page
+        tax                 ; SrcShift=0
         sta zDstShift
+        sta zDstOffset
 
         lda PackedBits
         sta zUnpackBits+0
@@ -182,9 +182,9 @@ DrawRow
 NextSrcShift
         lda PackedBits+1,Y
         sta zUnpackBits+1
-        lda #0
+        ldx #0
 UpdateSrcShift
-        sta zSrcShift
+        stx zSrcShift
 
         jsr Unpack2Bits     ; hhggffee C=? ddccbbaa 
         bcs UnpackDone
@@ -194,13 +194,13 @@ UpdateSrcShift
         lsr zUnpackBits+1   ; 00hhggff C=e eddccbba
         ror zUnpackBits+0   ; 00hhggff c=e eeddccbb 
 
-        lda zSrcShift
-        clc
-        adc #2
-        cmp #8              ; have 8 input bits?
+        ldx zSrcShift
+        inx
+        inx
+        cpx #8              ; have 8 input bits?
         bne UpdateSrcShift
         iny                 ; src++
-        bne NextSrcShift
+        bne NextSrcShift    ; always, since packed data length < 256
 UnpackDone
 
 
@@ -208,9 +208,10 @@ UnpackDone
 
     DO CONFIG_PRINT_CPUINFO
 
+        txa                 ; (2) A=0 from (1) Unpack2Bits
         ldx #0
 PrintText
-        jsr BASCALC         ; 
+        jsr BASCALC         
         ldy #0
 CopyTextLine
         lda TextLine,X
@@ -245,7 +246,6 @@ ModelPlus
 Unpack2Bits
 
 ; DoublePixel
-        stx zSaveX
         sty zSaveY
         
         lda zUnpackBits
@@ -259,46 +259,44 @@ Unpack2Bits
         ldx #0
         stx zMask
 
-        ldx zDstShift
+        ldy zDstShift       ;
         beq NoShiftSherlock
 MakeShiftMask
         asl
         rol zMask
-        dex
+        dey
         bne MakeShiftMask
 NoShiftSherlock
 
         asl                 ; msb of byte0 set?
         rol zMask           ; shift in to lsb of byte1
-
         sec                 ; MSB=1 color=blue/orange
         ror
-
-        ldy zDstShift       ; x={0,1,2} + 4 < 7
-        cpy #3              ; all bits fit into dest byte?
-
-        ldx zSaveX
+        ldx zDstOffset
         ora UnpackAddr,X    ; do all bits that fit
         sta UnpackAddr,X
-        bcc UpdateDestOffset
+
+        lda zDstShift       ; x={0,1,2} + 4 < 7
+        clc
+        adc #4
+        cmp #7              ; all bits fit into dest byte?
+        bcc FitSameByte
 
 ; Update partial next byte of dest
-        inx
-        stx zSaveX
-        cpx #$28            ; C = x < 28
+        ; x = x + 4 - 7
+        ; x = x - 3
+        sbc #7              ; C=1
+        tay                 ; push zDstShift
 
+        inx
+        stx zDstOffset
         lda zMask
-        ora #$80
         ora UnpackAddr,X
         sta UnpackAddr,X
 
-        ; x = x + 4 - 7
-        ; x = x - 3
-        ldy zDstShift
-        dey
-        dey
-        dey
-        bcc LineNotDone     ; C = x < 28
+        tya                 ; pop zDstShift
+        cpx #$28            ; C = x < 28
+        bcc FitSameByte     ; C = x < 28
 
 ; ------------------------------------------------------------------------
 ; Copy Buffer to HGR
@@ -339,27 +337,16 @@ CopyNextByte
         adc #$04
         sta zHgrPtr+1
 
-        stx zSaveX          ; X=0 last loop iteration
+        stx zDstOffset      ; X=0 last loop iteration
+        txa                 ; A=0 zDstShift
         dex
         bpl Draw8Rows
 
-        iny                 ; Y=0 -> zDstShift
-               
-        lda zCursorY
-        cmp #$14            ; Y=$40 .. $A0, Rows $8..$13 (inclusive)
-        bcs OuputDone
-        bcc LineNotDone     ; Next Scan Line, start at dst bit 0
-
-UpdateDestOffset            ; C=0 from NoShiftSherlock 
-        iny
-        iny
-        iny
-        iny
-LineNotDone
-        sty zDstShift
-        ldx zSaveX          ; NOTE: C=0 from CMPs above
-        ldy zSaveY
-OuputDone
+        ldx zCursorY        ; (3) X=13
+        cpx #$14            ; Y=$40 .. $A0, Rows $8..$13 (inclusive)
+FitSameByte
+        sta zDstShift
+        ldy zSaveY          ; NOTE: C=0 from CMPs above
         rts
 
 
@@ -400,7 +387,7 @@ TextLine    ;0123456789012345678901234567890123456789
 
 ; NOTE: Generated by ascii2hgr2bit
 ; ASCII: 70*12 = 840 chars
-; Packed 2bits/2pixel: 70 chars * 2 bits/char / 8 bits/byte = 140 bits / 8 = 17.5 bytes
+; Packed 2bits/2pixel: 70 chars * 2 bits/char / 8 bits/byte = 140 bits / 8 = 17.5 bytes/scanline
 ; 840 chars * 2 bits/color / 8 bits/byte = 210 bytes
 
     PUT packedlogo.s

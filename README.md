@@ -3,7 +3,7 @@
 
 Linux Logo in 6502 assembly language.
 
-Size: 692 ($2B4) bytes
+Size: 682 ($2AA) bytes
 
 
 # Screenshots
@@ -23,7 +23,7 @@ Size: 692 ($2B4) bytes
 * Cleaned up fugly logo by Albert Lai
   * Logo is 70 chars wide
   * Logo is bit packed 2 bits/char; expands 70 chars * 4 px = 280 px
-  * Logo takes up 70*12*2/8 = 210 bytes compared to 80*12 = 960 bytes
+  * Logo takes up 70*12*2/8 = 210 bytes compared to 79*12 = 948 bytes
   * X is now symmetrical
   * Fixed L,i,n kerning
   * Fixed x Penguin kerning
