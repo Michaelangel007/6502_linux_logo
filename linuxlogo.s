@@ -208,7 +208,7 @@ UnpackDone
 
     DO CONFIG_PRINT_CPUINFO
 
-        txa                 ; (2) A=0 from (1) Unpack2Bits
+        txa                 ; (2) X=$14 from (1) Unpack2Bits
         ldx #0
 PrintText
         jsr BASCALC         
@@ -342,7 +342,7 @@ CopyNextByte
         dex
         bpl Draw8Rows
 
-        ldx zCursorY        ; (3) X=13
+        ldx zCursorY        ; (1) X=14, see (2)
         cpx #$14            ; Y=$40 .. $A0, Rows $8..$13 (inclusive)
 FitSameByte
         sta zDstShift
