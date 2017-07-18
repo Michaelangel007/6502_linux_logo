@@ -5,21 +5,21 @@
 ; Zero Page ROM vars
 zCursorX    = $24 ; CH
 zCursorY    = $25 ; CH
-zHgrPtr     = $26 ; GBASL = Dst
+zHgrPtr     = $26 ; GBASL = Dst Pixel Addr
 zTxtPtr     = $28 ; BASL  = Dst
 
-zDstOffset  = $F9 ; unpack[ iDst ]
-zSaveY      = $FA
-zMask       = $FB ; adjacent byte for next pixels
-zSrcShift   = $FC ; i mod 8
-zDstShift   = $FD ; i mod 7
+zDstOffset  = $F9 ; dst
+zSrcOffset  = $FA ; src
+zMask       = $FB ; adjacent byte to write next pixels
+zSrcShift   = $FC ; Input  Bit Position = i mod 8
+zDstShift   = $FD ; Output Bit Position = i mod 7
 zUnpackBits = $FE ; 16-bit unpack
 
 ; ROM
 HOME        = $FC58
 IB_HGR      = $D000 ; Integer   BASIC ][ only
 AS_HGR      = $F3E2 ; Applesoft BASIC ][+ or newer
-BASCALC     = $FBC1 ; A=Row, Calculate BASL,BASH text address
+BASCALC     = $FBC1 ; A=Row, Calculate BASL,BASH text start-of-line address
 
 ;Bank Addr --  Addr Bank Read ---   Write -------
 ; 2  $C080 == $C088  1   Read RAM   Write protect
@@ -34,7 +34,7 @@ MACHINEID2  = $FBC0
 MACHINEID3  = $FBBF ; //c version
 
 ; Config
-UnpackAddr  = $3FD0 ; Y=191, $28 bytes
+UnpackAddr  = $3FD0 ; Y=191, Unpacked pixel buffer of $28 bytes
 CONFIG_PROBE_CPUINFO = 1
 CONFIG_PRINT_CPUINFO = 1
 
@@ -188,7 +188,7 @@ UpdateSrcShift
         stx zSrcShift
 
         jsr Unpack2Bits     ; hhggffee C=? ddccbbaa 
-        bcs UnpackDone
+        bcs UnpackDone      ; inlining Unpack2Bits has BNE and BNE > 128 byte offset
 
         lsr zUnpackBits+1   ; 0hhggffe C=e ddccbbaa
         ror zUnpackBits+0   ; 0hhggffe C=e eddccbba
@@ -208,10 +208,9 @@ UnpackDone
 ; ------------------------------------------------------------------------
 
     DO CONFIG_PRINT_CPUINFO
-
         txa                 ; (2) X=$14 from (1) Unpack2Bits
-        ldx #0
-PrintText
+        ldx #0              ; This means we have an extra "row" of HGR garbage at Y=160
+PrintText                   ; but we can't see it since we are in mixed mode
         jsr BASCALC         
         ldy #0
 CopyTextLine
@@ -239,17 +238,41 @@ ModelPlus
         sta ModType,x
     FIN
 
-        rts
+; ========================================================================
+; NOTE: Normally there is
+;       rts
+; but to save a byte we intentionally fall into Unpack2Bits in 2 locations:
+;
+; A) if we reach
+;        apple_iie_enhanced
+; B) end of program
+;
+; This means there is an extremely rare bug of having extra garbage 
+; on the HGR screen for (A) under these conditions:
+;
+;   F9:27 <- zDstOffset = column 39
+;   FE:0x <- non-zero value bottom 2 bits are set
+;
+; To trigger:
+;    CALL-151
+;    BLOAD LINUXLOGO
+;    F9:27
+;    FE:02
+;    900G
+; Or on two lines
+;    BLOAD LINUXLOGO
+;    F9:27 N FE:2 N 900G
+; And a thin blue line will appear in the top right
+; ========================================================================
 
 ; ------------------------------------------------------------------------
 ; Expand 1 pixel  (2 bits) via
 ; Output 2 pixels (4 bits)
 Unpack2Bits
 
-; DoublePixel
-        sty zSaveY
+        sty zSrcOffset
         
-        lda zUnpackBits
+        lda zUnpackBits     ; Double the pixel
         asl                 ; A=?????ba0
         asl                 ; A=????ba00
         eor zUnpackBits     ; A=????xxyy
@@ -260,7 +283,7 @@ Unpack2Bits
         ldx #0
         stx zMask
 
-        ldy zDstShift       ;
+        ldy zDstShift       ; which 280 px column is next pixel writing to?
         beq NoShiftSherlock
 MakeShiftMask
         asl
@@ -286,7 +309,7 @@ NoShiftSherlock
 ; Update partial next byte of dest
         ; x = x + 4 - 7
         ; x = x - 3
-        sbc #7              ; C=1
+        sbc #7              ; C=1 from "BCC else" above
         tay                 ; push zDstShift
 
         inx
@@ -300,13 +323,9 @@ NoShiftSherlock
         bcc FitSameByte     ; C = x < 28
 
 ; ------------------------------------------------------------------------
-; Copy unpacked buffer to 8 HGR scanlines
-
-        inc zCursorY
-
-; ------------------------------------------------------------------------
 ; Udpate the Text Address
 ; Update the HGR scanline Address
+        inc zCursorY
         lda zCursorY
         jsr BASCALC
 
@@ -317,7 +336,9 @@ NoShiftSherlock
         clc             ; every 8 HGR scanline address
         adc #$1c        ; is Text Page $04 + $1C = HGR Page $20
         sta zHgrPtr+1
+
 ; ------------------------------------------------------------------------
+; Copy unpacked buffer to 8 HGR scanlines
 
         ldx #7              ; Repeat each scanline 8 times
 Draw8Rows
@@ -347,7 +368,7 @@ CopyNextByte
         cpx #$14            ; Y=$40 .. $A0, Rows $8..$13 (inclusive)
 FitSameByte
         sta zDstShift
-        ldy zSaveY          ; NOTE: C=0 from CMPs above
+        ldy zSrcOffset      ; NOTE: C=0 from CMPs above
         rts
 
 

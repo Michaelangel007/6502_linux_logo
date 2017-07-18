@@ -3,7 +3,7 @@
 
 Linux Logo in 6502 assembly language.
 
-Size: 682 ($2AA) bytes
+Size: 681 ($2A9) bytes
 
 
 # Screenshots
@@ -55,7 +55,7 @@ Note: Lowercase doesn't display properly on \]\[.
 
 ![Apple \]\[+](pics/ll_6502_2plus.png)
 ![Apple //e  ](pics/ll_6502_2e.png)
-
+![79x12 Logo ](pics/original_linux_logo_79x12.png)
 
 # License
 
@@ -63,3 +63,6 @@ Note: Lowercase doesn't display properly on \]\[.
 
 If you use code, please provide a comment link so people can follow it for updates.
 
+# Tools used
+
+* [Merlin32]()
