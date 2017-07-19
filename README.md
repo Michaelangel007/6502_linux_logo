@@ -29,6 +29,7 @@ Size: 667 ($29B) bytes
   * Fixed x Penguin kerning
   * Fixed L to fit
   * Chopped off 2 columns of penguin to fit 70 chars
+  * Red 'i' is now a beautiful blue to break up the monotomy of all orange
 
 ```
 ..........................................................#####.......
