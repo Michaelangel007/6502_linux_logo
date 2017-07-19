@@ -78,7 +78,7 @@ apple_iiplus
         jsr AS_HGR          ; HGR on Apple ][+ or newer
         pla
         cmp  #$EA           ; 'j' apple ][+?
-        bne apple_iie       ; if so keep going
+        bne apple_iie_iic   ; if so keep going
 
         lda #"+"
         bne set_apple_ii
@@ -127,7 +127,7 @@ RAM_size
         bne done_detecting
 
 ; Detect //e //e+ //c
-apple_iie
+apple_iie_iic
         lda MACHINEID2      ; FBC0: $00 = //c, $EA = //e, E0 = //e+
         beq apple_iic       ; check for apple //c
         cmp #$E0            ; if we're an Apple IIe (original)
