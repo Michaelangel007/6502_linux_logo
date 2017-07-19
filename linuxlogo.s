@@ -67,11 +67,7 @@ DetectCPU
 detect_ram
         lda MACHINEID1      ; FBB3: $38 = ][, $EA = ][+, $06 = //e //c IIgs
         cmp #$38            ; '8'
-        bne apple_iiplus
-
-apple_ii
-        jsr IB_HGR          ; HGR on original ][ only!
-        beq apple_ii_normal ; always, ends with BNE $D01B RTS
+        beq apple_ii
 
 apple_iiplus
         pha
@@ -84,8 +80,9 @@ apple_iiplus
         bne set_apple_ii
 
 ; if we get here we're a ii+ or iii in emulation mode
-apple_ii_normal
-        lda #" "            ; $A0
+apple_ii
+        jsr IB_HGR          ; HGR on original ][ only!
+        lda #" "            ; "_6502"
 set_apple_ii
         ldx #"]"
         ldy #"["
@@ -113,7 +110,7 @@ detect_langcard
         sta $D000
 
 RAM_64K
-        ldx #"6"
+        ldx #"6"            ; "64K"
         ldy #"4"
         bne RAM_size
 apple_ii_48K
@@ -144,7 +141,7 @@ apple_iie_enhanced          ; //c+
         jsr ModelPlus       ;    ^
 done_detecting
         sta ROMIN           ; Turn off Language Card
-        sta ROMIN           ; if it was probed
+;       sta ROMIN           ; if it was probed
     FIN
 
 ; ------------------------------------------------------------------------
