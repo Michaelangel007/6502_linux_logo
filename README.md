@@ -45,7 +45,7 @@ Size: 667 ($29B) bytes
 ##########..###.####...####...####.###.#####.#####..QQQQQ#######QQQQQ.
 ```
 
-See: [ascii2hgr2bit](ascii2hgr2bit.c) for packing ASCII to 2 bits/char.
+See: [ascii2hgr2bit.c](ascii2hgr2bit.c) for packing ASCII to 2 bits/char.
 NOTE: PackedLen isn't needed if full 40 bytes HGR width is unpacked to.
 
 Inspired from non-optimized version. Size: 1,573 ($625) bytes
@@ -55,6 +55,9 @@ Note: Lowercase doesn't display properly on \]\[.
 
 ![Apple \]\[+](pics/ll_6502_2plus.png)
 ![Apple //e  ](pics/ll_6502_2e.png)
+
+The 79x12 logo that was used as the basis for the logo cleanup:
+
 ![79x12 Logo ](pics/original_linux_logo_79x12.png)
 
 # License
