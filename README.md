@@ -1,7 +1,7 @@
 
 # 6502 Linux Logo
 
-Linux Logo in 6502 assembly language.
+Optimized Linux Logo in 6502 assembly language for size.
 
 Size: 667 ($29B) bytes
 
@@ -69,4 +69,9 @@ If you use code, please provide a comment link so people can follow it for updat
 
 # Tools used
 
-* [Merlin32]()
+* [Merlin32](brutaldeluxe.fr/products/crossdevtools/merlin/)
+
+# Credits
+
+* qkumba for his excellent optimization tips and tricks
+
