@@ -45,9 +45,6 @@ Main
         jsr HOME
 
 ; ------------------------------------------------------------------------
-    DO CONFIG_PROBE_CPUINFO
-DetectCPU
-
 ; Apple II Technical Note #7
 ; https://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Computers/Apple%20II/Apple%20II/Documentation/Misc%20%23007%20Apple%20II%20Family%20ID.pdf
 ;
@@ -64,7 +61,9 @@ DetectCPU
 ; Apple //c Rev Mem XP  $06   $00   $04
 ; Apple //c+            $06   $00   $05
 ; Apple IIgs
-detect_ram
+    DO CONFIG_PROBE_CPUINFO
+
+detect_model
         lda MACHINEID1      ; FBB3: $38 = ][, $EA = ][+, $06 = //e //c IIgs
         cmp #$38            ; '8'
         beq apple_ii
