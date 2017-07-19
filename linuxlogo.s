@@ -163,11 +163,10 @@ Unpack
 
         lda #7              ; will INC, $0428 (Text) + $1C00 => $2028 (HGR)
         sta zCursorY        ; Start Row=8
-        lda #0
-        tay   
-        tax                 ; SrcShift=0
-        sta zDstShift
-        sta zDstOffset
+
+        ldy #0              ; zSrcOffset
+        sty zDstShift
+        sty zDstOffset
 
         lda PackedBits
         sta zUnpackBits+0
@@ -175,7 +174,7 @@ Unpack
 NextSrcShift
         lda PackedBits+1,Y
         sta zUnpackBits+1
-        ldx #0
+        ldx #0              ; zSrcShift
 UpdateSrcShift
         stx zSrcShift
 
@@ -277,16 +276,12 @@ Unpack2Bits
         stx zMask
 
         ldy zDstShift       ; which 280 px column is next pixel writing to?
-        beq NoShiftSherlock
 MakeShiftMask
-        asl
-        rol zMask
-        dey
-        bne MakeShiftMask
-NoShiftSherlock
-
         asl                 ; msb of byte0 set?
         rol zMask           ; shift in to lsb of byte1
+        dey
+        bpl MakeShiftMask
+
         sec                 ; MSB=1 color=blue/orange
         ror
         ldx zDstOffset
@@ -294,8 +289,7 @@ NoShiftSherlock
         sta UnpackAddr,X
 
         lda zDstShift       ; x={0,1,2} + 4 < 7
-        clc
-        adc #4
+        adc #4              ; C=0 from ASL ROR above
         cmp #7              ; all bits fit into dest byte?
         bcc FitSameByte
 
