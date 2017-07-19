@@ -68,17 +68,17 @@ detect_model
         cmp #$38            ; '8'
         beq apple_ii
 
-apple_iiplus
         pha
         jsr AS_HGR          ; HGR on Apple ][+ or newer
         pla
         cmp  #$EA           ; 'j' apple ][+?
         bne apple_iie_iic   ; if so keep going
 
+apple_iiplus
+; if we get here we're a ii+ or iii in emulation mode
         lda #"+"
         bne set_apple_ii
 
-; if we get here we're a ii+ or iii in emulation mode
 apple_ii
         jsr IB_HGR          ; HGR on original ][ only!
         lda #" "            ; "_6502"
@@ -255,7 +255,6 @@ ModelPlus
 ; Expand 1 pixel  (2 bits) via
 ; Output 2 pixels (4 bits)
 Unpack2Bits
-
         sty zSrcOffset
         
         lda zUnpackBits     ; Double the pixel
@@ -286,10 +285,8 @@ MakeShiftMask
         adc #4              ; C=0 from ASL ROR above
         cmp #7              ; all bits fit into dest byte?
         bcc FitSameByte
-
-; Update partial next byte of dest
-        ; x = x + 4 - 7
-        ; x = x - 3
+                            ; Update partial next byte of dest
+                            ; x = x + 4 - 7
         sbc #7              ; C=1 from "BCC else" above
         tay                 ; push zDstShift
 
