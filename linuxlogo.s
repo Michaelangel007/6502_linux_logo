@@ -70,7 +70,7 @@ detect_ram
         bne apple_iiplus
 
 apple_ii
-        jsr IB_HGR          ; HGR on ][
+        jsr IB_HGR          ; HGR on original ][ only!
         beq apple_ii_normal ; always, ends with BNE $D01B RTS
 
 apple_iiplus
