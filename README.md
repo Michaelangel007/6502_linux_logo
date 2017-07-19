@@ -3,7 +3,7 @@
 
 Linux Logo in 6502 assembly language.
 
-Size: 673 ($2A1) bytes
+Size: 667 ($29B) bytes
 
 
 # Screenshots
