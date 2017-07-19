@@ -75,7 +75,7 @@ apple_ii
 
 apple_iiplus
         pha
-        jsr AS_HGR         ; HGR on Apple ][+ or newer
+        jsr AS_HGR          ; HGR on Apple ][+ or newer
         pla
         cmp  #$EA           ; 'j' apple ][+?
         bne apple_iie       ; if so keep going
