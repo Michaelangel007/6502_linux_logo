@@ -66,18 +66,16 @@ DetectCPU
 ; Apple IIgs
 detect_ram
         lda MACHINEID1      ; FBB3: $38 = ][, $EA = ][+, $06 = //e //c IIgs
-        pha
         cmp #$38            ;
         bne apple_iiplus
 
 apple_ii
-        pla
         jsr IB_HGR          ; HGR on ][
         beq apple_ii_normal ; always, ends with BNE $D01B RTS
 
 apple_iiplus
+        pha
         jsr AS_HGR         ; ][ = $D000, Only on Apple ][+
-
         pla
         cmp  #$EA           ;  apple ][+?
         bne apple_iie       ; if so keep going
