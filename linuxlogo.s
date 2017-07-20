@@ -168,7 +168,7 @@ Unpack
 NextSrcShift
         lda PackedBits+1,Y
         sta zUnpackBits+1
-        ldx #0              ; zSrcShift
+        ldx #8              ; zSrcShift, have 8 input bits?
 UpdateSrcShift
         stx zSrcShift
 
@@ -181,9 +181,8 @@ UpdateSrcShift
         ror zUnpackBits+0   ; 00hhggff c=e eeddccbb 
 
         ldx zSrcShift
-        inx
-        inx
-        cpx #8              ; have 8 input bits?
+        dex
+        dex
         bne UpdateSrcShift
         iny                 ; src++
         bne NextSrcShift    ; always, since packed data length < 256

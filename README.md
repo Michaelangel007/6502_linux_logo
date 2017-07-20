@@ -3,7 +3,7 @@
 
 Optimized Linux Logo in 6502 assembly language for size.
 
-Size: 667 ($29B) bytes
+Size: 665 ($299) bytes
 
 
 # Screenshots
