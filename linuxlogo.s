@@ -5,7 +5,9 @@
 ; Zero Page ROM vars
 zCursorX    = $24 ; CH
 zCursorY    = $25 ; CH
-zHgrPtr     = $26 ; GBASL = Dst Pixel Addr
+
+; NOTE: We *don't* use this, instead we *re-use* zTxtPtr
+;zHgrPtr    = $26 ; GBASL = Dst Pixel Addr
 zTxtPtr     = $28 ; BASL  = Dst
 
 zDstOffset  = $F9 ; dst
@@ -306,12 +308,13 @@ MakeShiftMask
         lda zCursorY
         jsr BASCALC
 
-        lda zTxtPtr+0   ; every 8 HGR scanline address
-        sta zHgrPtr+0   ; is exactly same as Text low byte
-
+; Yes, this is evil ...
+; Instead of copying zTxtPtr over to zHgrPtr
+; We re-use it by forcing it to be a HGR address!
+; This *is* safe BECAUSE we call JSR BASCALC _before_ we do any text printing.
         lda zTxtPtr+1   ; every 8 HGR scanline address
         eor #$24        ; is Text Page $04 + $1C = HGR Page $20; CLC, ADC #$1C
-        sta zHgrPtr+1   ; but we can optimize for HGR page 1 via EOR #$24 -- Thanks Mike B.!
+        sta zTxtPtr+1   ; but we can optimize for HGR page 1 via EOR #$24 -- Thanks Mike B.!
 
 ; ------------------------------------------------------------------------
 ; Copy unpacked buffer to 8 HGR scanlines
@@ -321,7 +324,7 @@ Draw8Rows
         ldy #39             ; 280/7 = 40 bytes/scanline
 CopyScanLine
         lda UnpackAddr,Y      
-        sta (zHgrPtr),Y
+        sta (zTxtPtr),Y
 
         txa                 ; Clear source on last scanline copy
         bne CopyNextByte
@@ -331,9 +334,9 @@ CopyNextByte
         bpl CopyScanLine
 
         clc                 ; y = y+1
-        lda zHgrPtr+1       ; HGR addr_y+1 = addr_y + $0400
+        lda zTxtPtr+1       ; HGR addr_y+1 = addr_y + $0400
         adc #$04
-        sta zHgrPtr+1
+        sta zTxtPtr+1
 
         stx zDstOffset      ; X=0 last loop iteration
         txa                 ; A=0 zDstShift
