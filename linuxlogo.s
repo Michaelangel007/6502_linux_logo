@@ -309,10 +309,9 @@ MakeShiftMask
         lda zTxtPtr+0   ; every 8 HGR scanline address
         sta zHgrPtr+0   ; is exactly same as Text low byte
 
-        lda zTxtPtr+1   
-        clc             ; every 8 HGR scanline address
-        adc #$1c        ; is Text Page $04 + $1C = HGR Page $20
-        sta zHgrPtr+1
+        lda zTxtPtr+1   ; every 8 HGR scanline address
+        eor #$24        ; is Text Page $04 + $1C = HGR Page $20; CLC, ADC #$1C
+        sta zHgrPtr+1   ; but we can optimize for HGR page 1 via EOR #$24 -- Thanks Mike B.!
 
 ; ------------------------------------------------------------------------
 ; Copy unpacked buffer to 8 HGR scanlines
