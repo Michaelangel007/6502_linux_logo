@@ -3,7 +3,7 @@
 
 Optimized Linux Logo in 6502 assembly language for size.
 
-Size: 665 ($299) bytes
+Size: 664 ($298) bytes
 
 
 # Screenshots
@@ -74,4 +74,4 @@ If you use code, please provide a comment link so people can follow it for updat
 # Credits
 
 * qkumba for his excellent optimization tips and tricks
-
+* Mike B. for Text to HGR Page 1 optimization
