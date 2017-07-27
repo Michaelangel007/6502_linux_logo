@@ -308,47 +308,46 @@ MakeShiftMask
         lda zCursorY
         jsr BASCALC
 
+; ------------------------------------------------------------------------
+; Copy unpacked buffer to 8 HGR scanlines
+
+Draw8Rows
+        ldy #39             ; 280/7 = 40 bytes/scanline
+
 ; Yes, this is evil ...
 ; Instead of copying zTxtPtr over to zHgrPtr
 ; We re-use it by forcing it to be a HGR address!
 ; This *is* safe BECAUSE we call JSR BASCALC _before_ we do any text printing.
-        lda zTxtPtr+1   ; every 8 HGR scanline address
-        eor #$24        ; is Text Page $04 + $1C = HGR Page $20; CLC, ADC #$1C
-        sta zTxtPtr+1   ; but we can optimize for HGR page 1 via EOR #$24 -- Thanks Mike B.!
+        lda zTxtPtr+1       ; Translate text page row address to 
+        eor #$24            ;   every eighth HGR row address 
+        tax 
 
-; ------------------------------------------------------------------------
-; Copy unpacked buffer to 8 HGR scanlines
-
-        ldx #7              ; Repeat each scanline 8 times
-Draw8Rows
-        ldy #39             ; 280/7 = 40 bytes/scanline
-CopyScanLine
-        lda UnpackAddr,Y      
+Copy7x8
+        lda UnpackAddr,Y
+        stx zTxtPtr+1       
         sta (zTxtPtr),Y
+        inx                 ; y = y+1
+        inx                 ; HGR addr_y+1 = addr_y + $0400
+        inx      
+        inx
+        cpx #$40            ; hit HGR page 2 ? i.e. 8 scan lines done?
+        bcc Copy7x8         ; Loop until 7x8 pixel block is complete 
 
-        txa                 ; Clear source on last scanline copy
-        bne CopyNextByte
-        sta UnpackAddr,Y
-CopyNextByte
-        dey
-        bpl CopyScanLine
+        txa 
+        sbc #$20            ; Reset pointer for top of next 7x8 block 
+        tax 
+        lda #0 
+        sta UnpackAddr,Y    ; Clear source on last scanline copy 
+        sta zDstOffset      ; reset to start of unpack buffer
+        dey 
+        bpl Copy7x8         ; Loop until all 280x8 pixels are copied 
 
-        clc                 ; y = y+1
-        lda zTxtPtr+1       ; HGR addr_y+1 = addr_y + $0400
-        adc #$04
-        sta zTxtPtr+1
-
-        stx zDstOffset      ; X=0 last loop iteration
-        txa                 ; A=0 zDstShift
-        dex
-        bpl Draw8Rows
-
-        ldx zCursorY        ; (1) X=14, see (2)
-        cpx #$14            ; Y=$40 .. $A0, Rows $8..$13 (inclusive)
-FitSameByte
-        sta zDstShift
-        ldy zSrcOffset      ; NOTE: C=0 from CMPs above
-        rts
+        ldx zCursorY        ; (1) X=14, see (2) 
+        cpx #$14            ; Y=$40 .. $A0, Rows $8..$13 (inclusive) 
+FitSameByte 
+        sta zDstShift 
+        ldy zSrcOffset      ; NOTE: C=0 from CMPs above 
+        rts 
 
 
 ; ========================================================================
