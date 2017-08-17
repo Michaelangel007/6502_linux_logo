@@ -124,7 +124,7 @@ RAM_size
         sty RamSize+2
         bne done_detecting
 
-; Detect //e //e+ //c
+; Detect //e //e+ //c //c+
 apple_iie_iic
         lda MACHINEID2      ; FBC0: $00 = //c, $EA = //e, E0 = //e+
         beq apple_iic       ; check for apple //c
@@ -137,9 +137,10 @@ apple_iic
         lda MACHINEID3
         cmp #$05            ; //c+
         bne done_detecting
-apple_iie_enhanced          ; //c+
-        ldx #1              ; //e+
-        jsr ModelPlus       ;    ^
+apple_iie_enhanced          ; //e+
+        lda #"+"            ;    +
+        sta ModType+1       ;    ^
+
 done_detecting
         sta ROMIN           ; Turn off Language Card
 ;       sta ROMIN           ; if it was probed
@@ -213,16 +214,6 @@ CopyTextLine
         bne PrintText
 
         dec zCursorY
-
-; ------------------------------------------------------------------------
-; End of String offse for Model
-; IN: X = 0 II+
-;             ^
-;         1 //e+
-;              ^
-ModelPlus
-        lda #"+"
-        sta ModType,x
     FIN
 
 ; ========================================================================
