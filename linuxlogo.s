@@ -19,6 +19,7 @@ zUnpackBits = $FE ; 16-bit unpack
 
 ; ROM
 HOME        = $FC58
+COUT        = $FDED
 IB_HGR      = $D000 ; Integer   BASIC ][ only
 AS_HGR      = $F3E2 ; Applesoft BASIC ][+ or newer
 BASCALC     = $FBC1 ; A=Row, Calculate BASL,BASH text start-of-line address
@@ -44,7 +45,7 @@ CONFIG_PRINT_CPUINFO = 1
 
         ORG $900
 Main
-        jsr HOME
+        jsr HOME            ; For asethetics
 
 ; ------------------------------------------------------------------------
 ; Apple II Technical Note #7
@@ -194,24 +195,16 @@ UnpackDone
 
     DO CONFIG_PRINT_CPUINFO
         txa                 ; (2) X=$14 from (1) Unpack2Bits
+        jsr BASCALC         ; but we can't see it since we are in mixed mode
+
         ldx #0              ; This means we have an extra "row" of HGR garbage at Y=160
-PrintText                   ; but we can't see it since we are in mixed mode
-        jsr BASCALC         
-        ldy #0
 CopyTextLine
         lda TextLine,X
-        sta (zTxtPtr),Y
-        inx                 ; 3*40 = 120 chars max
-        iny
-        cpy #40
+        jsr COUT
+        inx
+        cpx #106           ; 3 rows of 40-col text but stop at col 27
         bne CopyTextLine
-
-        inc zCursorY
-        lda zCursorY
-        cmp #$17            ; Rows $14..$16 (inclusive)
-        bne PrintText
-
-        dec zCursorY
+        rts
     FIN
 
 ; ========================================================================
@@ -333,6 +326,7 @@ Copy7x8
 
         ldx zCursorY        ; (1) X=14, see (2) 
         cpx #$14            ; Y=$40 .. $A0, Rows $8..$13 (inclusive) 
+
 FitSameByte 
         sta zDstShift 
         ldy zSrcOffset      ; NOTE: C=0 from CMPs above 
@@ -348,9 +342,9 @@ ModType = * + 24 + 40*2
 ; Uppercase in case of Apple ][ without lowercase support
             ;          1         2         3
 TextLine    ;0123456789012345678901234567890123456789
-        ASC "  LINUX VERSION 2.6.22.6, COMPILED 2007 " ; Row $14
-        ASC " ONE 1.02MHZ 65C02 PROCESSOR, 128KB RAM " ; Row $15
-        ASC "                APPLE //e               " ; Row $16
+        ASC "  LINUX VERSION 2.6.22.6, COMPILED 2007 " ; Row $14 +40 =  40
+        ASC " ONE 1.02MHZ 65C02 PROCESSOR, 128KB RAM " ; Row $15 +40 =  80
+        ASC "                APPLE //e "               ; Row $16 +26 = 106 chars
 ;                         ^          ^     ^
 ;                         CPUTYPE    MOD   RAM
 
