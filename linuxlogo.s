@@ -103,12 +103,10 @@ detect_langcard
         sta RAMIN           ; Read RAM
 
         lda $D000
-        eor #$FF
-        sta $D000
+        inc $D000
         cmp $D000
-        bne apple_ii_48K
-        eor #$FF
-        sta $D000
+        beq apple_ii_48K
+        dec $D000
 
 RAM_64K
         ldx #"6"            ; "64K"
